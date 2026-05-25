@@ -15,8 +15,17 @@ public class AiCodeHelper {
     @Resource
     private ChatModel qwenChatModel;
 
+    // text prompt
     public String chat(String message){
         UserMessage userMessage = UserMessage.from(message);
+        ChatResponse chatResponse = qwenChatModel.chat(userMessage);
+        AiMessage aiMessage = chatResponse.aiMessage();
+        log.info("AI output " + aiMessage.toString());
+        return aiMessage.text();
+    }
+
+    // customized prompt (check model capability)
+    public String chatWithMessage(UserMessage userMessage){
         ChatResponse chatResponse = qwenChatModel.chat(userMessage);
         AiMessage aiMessage = chatResponse.aiMessage();
         log.info("AI output " + aiMessage.toString());
