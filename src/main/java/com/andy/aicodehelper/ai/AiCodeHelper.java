@@ -28,7 +28,7 @@ public class AiCodeHelper {
             """;
 
     // text prompt
-    public String chat(String message){
+    public String chat(String message) {
         SystemMessage systemMessage = SystemMessage.from(SYSTEM_MESSAGE);
         UserMessage userMessage = UserMessage.from(message);
         ChatResponse chatResponse = qwenChatModel.chat(systemMessage, userMessage);
@@ -38,7 +38,7 @@ public class AiCodeHelper {
     }
 
     // customized prompt (check model capability)
-    public String chatWithMessage(UserMessage userMessage){
+    public String chatWithMessage(UserMessage userMessage) {
         ChatResponse chatResponse = qwenChatModel.chat(userMessage);
         AiMessage aiMessage = chatResponse.aiMessage();
         log.info("AI output " + aiMessage.toString());
