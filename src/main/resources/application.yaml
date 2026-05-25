@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ai-code-helper
+  profiles:
+    active: local
+langchain4j:
+  community:
+    dashscope:
+      chat-model:
+        base-url: https://dashscope-intl.aliyuncs.com/api/v1
+        model-name: qwen-max
+        api-key: <You API Key here>
