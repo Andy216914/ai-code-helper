@@ -1,16 +1,25 @@
-import { defineStore } from 'pinia'
+import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref, watch } from 'vue'
-import { openChatStream, type ChatStreamHandle } from '@/api/chat'
+import { openChatStream, openVisionStream, type ChatStreamHandle } from '@/api/chat'
 import { useSmoothStream } from '@/composables/useSmoothStream'
 
 export type MessageRole = 'user' | 'assistant'
 export type MessageStatus = 'streaming' | 'complete' | 'error'
+
+export interface Attachment {
+  name: string
+  mime: string
+  isImage: boolean
+  /** Object URL for an inline image thumbnail; revoked on newConversation. */
+  previewUrl?: string
+}
 
 export interface Message {
   id: string
   role: MessageRole
   content: string
   status: MessageStatus
+  attachment?: Attachment
 }
 
 function genId(): string {
@@ -31,18 +40,38 @@ export const useChatStore = defineStore('chat', () => {
 
   const smooth = useSmoothStream()
 
-  // Sync the smooth-streamed text into the active assistant message.
+  // Sync the smooth-streamed text into the active assistant message as it animates.
   watch(smooth.displayedText, (text) => {
     if (!currentStreamingId) return
     const msg = messages.value.find((m) => m.id === currentStreamingId)
     if (msg) msg.content = text
   })
 
+  // Finalize ONLY when the typewriter has fully caught up to the received text (after the
+  // network ended). This guarantees the whole reply is typed out before it renders complete.
+  watch(smooth.finished, (done) => {
+    if (!done || !currentStreamingId) return
+    const msg = messages.value.find((m) => m.id === currentStreamingId)
+    if (msg) {
+      msg.content = smooth.displayedText.value
+      msg.status = 'complete'
+    }
+    currentStreamingId = null
+    currentHandle = null
+    isStreaming.value = false
+  })
+
   function findMessage(id: string): Message | undefined {
     return messages.value.find((m) => m.id === id)
   }
 
-  function startAssistantStream(promptText: string): void {
+  function revokePreviews() {
+    for (const m of messages.value) {
+      if (m.attachment?.previewUrl) URL.revokeObjectURL(m.attachment.previewUrl)
+    }
+  }
+
+  function startAssistantStream(promptText: string, file?: File): void {
     const assistantMsg: Message = {
       id: genId(),
       role: 'assistant',
@@ -54,22 +83,13 @@ export const useChatStore = defineStore('chat', () => {
     smooth.reset()
     isStreaming.value = true
 
-    currentHandle = openChatStream({
-      memoryId: memoryId.value,
-      message: promptText,
-      onChunk: (chunk) => smooth.appendChunk(chunk),
-      onDone: () => {
-        smooth.finish()
-        if (currentStreamingId) {
-          const msg = findMessage(currentStreamingId)
-          if (msg) msg.status = 'complete'
-        }
-        currentStreamingId = null
-        currentHandle = null
-        isStreaming.value = false
-      },
+    const callbacks = {
+      onChunk: (chunk: string) => smooth.appendChunk(chunk),
+      // Network done — but keep the id/streaming state set. The `finished` watcher above
+      // finalizes the message once the typewriter has drained the full reply.
+      onDone: () => smooth.endStream(),
       onError: () => {
-        smooth.finish()
+        smooth.halt() // leaves `finished` false so the finished-watcher won't mark it complete
         if (currentStreamingId) {
           const msg = findMessage(currentStreamingId)
           if (msg) msg.status = 'error'
@@ -78,12 +98,20 @@ export const useChatStore = defineStore('chat', () => {
         currentHandle = null
         isStreaming.value = false
       },
-    })
+    }
+
+    if (file) {
+      // Vision endpoint is stateless (no memoryId) — this turn is one-shot.
+      currentHandle = openVisionStream({ message: promptText, file, ...callbacks })
+    } else {
+      currentHandle = openChatStream({ memoryId: memoryId.value, message: promptText, ...callbacks })
+    }
   }
 
-  function sendMessage(text: string): void {
+  function sendMessage(text: string, file?: File): void {
     const trimmed = text.trim()
-    if (!trimmed || isStreaming.value) return
+    // Allow sending when either text or a file is present.
+    if ((!trimmed && !file) || isStreaming.value) return
 
     const userMsg: Message = {
       id: genId(),
@@ -91,8 +119,17 @@ export const useChatStore = defineStore('chat', () => {
       content: trimmed,
       status: 'complete',
     }
+    if (file) {
+      const isImage = file.type.startsWith('image/')
+      userMsg.attachment = {
+        name: file.name,
+        mime: file.type,
+        isImage,
+        previewUrl: isImage ? URL.createObjectURL(file) : undefined,
+      }
+    }
     messages.value.push(userMsg)
-    startAssistantStream(trimmed)
+    startAssistantStream(trimmed, file)
   }
 
   function stopStream(): void {
@@ -100,14 +137,17 @@ export const useChatStore = defineStore('chat', () => {
       currentHandle.abort()
       currentHandle = null
     }
-    smooth.finish()
+    smooth.halt() // freeze the animation where it is; finalize manually below
     if (currentStreamingId) {
       const msg = findMessage(currentStreamingId)
       if (msg) {
+        // Keep whatever has been typed out so far.
+        const shown = smooth.displayedText.value
         // If nothing was streamed before stop, drop the empty assistant bubble entirely.
-        if (!msg.content) {
+        if (!shown) {
           messages.value = messages.value.filter((m) => m.id !== msg.id)
         } else {
+          msg.content = shown
           msg.status = 'complete'
         }
       }
@@ -127,6 +167,8 @@ export const useChatStore = defineStore('chat', () => {
       }
     }
     if (lastUserIdx === -1) return
+    // Retry isn't supported for file turns — the File isn't retained after send.
+    if (messages.value[lastUserIdx].attachment) return
     const lastUserText = messages.value[lastUserIdx].content
     // Drop everything after that user message (the failed assistant reply).
     messages.value = messages.value.slice(0, lastUserIdx + 1)
@@ -135,6 +177,7 @@ export const useChatStore = defineStore('chat', () => {
 
   function newConversation(): void {
     if (isStreaming.value) stopStream()
+    revokePreviews()
     messages.value = []
     memoryId.value = genMemoryId()
   }
@@ -149,3 +192,9 @@ export const useChatStore = defineStore('chat', () => {
     newConversation,
   }
 })
+
+// Without this, Vite hot-reloads components but keeps the OLD store instance — so edits to
+// the streaming/finalization logic here silently don't take effect until a full page reload.
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useChatStore, import.meta.hot))
+}

@@ -1,6 +1,8 @@
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js/lib/common'
 import 'highlight.js/styles/github.css'
+// Dark-mode token colors, scoped under [data-theme='dark'] (overrides github.css in dark).
+import '@/styles/highlight-dark.css'
 
 function escapeHtml(s: string): string {
   return s

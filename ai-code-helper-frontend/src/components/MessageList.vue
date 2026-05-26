@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia'
 import { useChatStore } from '@/stores/chat'
 import { useAutoScroll } from '@/composables/useAutoScroll'
 import MessageBubble from './MessageBubble.vue'
-import EmptyState from './EmptyState.vue'
 
 const chat = useChatStore()
 const { messages, isStreaming } = storeToRefs(chat)
@@ -41,7 +40,6 @@ function resumeScroll() {
   <div class="message-list-wrap">
     <div ref="scrollContainer" class="message-list">
       <div class="message-list-inner">
-        <EmptyState v-if="messages.length === 0" />
         <MessageBubble
           v-for="msg in messages"
           :key="msg.id"
@@ -72,31 +70,33 @@ function resumeScroll() {
 .message-list {
   flex: 1;
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--bg);
 }
 .message-list-inner {
-  max-width: 760px;
+  max-width: 820px;
   margin: 0 auto;
-  padding: 16px 20px 32px;
+  /* Generous bottom space so the last message clears the docked (overlapping) composer. */
+  padding: 24px 24px 168px;
 }
 .scroll-pill {
   position: absolute;
   left: 50%;
-  bottom: 16px;
+  bottom: 120px; /* sit above the docked composer */
   transform: translateX(-50%);
-  background: #111827;
-  color: #ffffff;
+  z-index: 6;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
   border: none;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   transition: background 0.15s, transform 0.05s;
 }
 .scroll-pill:hover {
-  background: #1f2937;
+  background: var(--btn-primary-bg-hover);
 }
 .scroll-pill:active {
   transform: translateX(-50%) translateY(1px);

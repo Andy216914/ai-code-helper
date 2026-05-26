@@ -1,29 +1,17 @@
 <script setup lang="ts">
-import { useChatStore } from '@/stores/chat'
-
-const chat = useChatStore()
-
-const suggestions = [
-  'Give me a learning path for becoming a backend developer',
-  'Suggest a portfolio project idea for a junior Java dev',
-  'Help me improve my resume for an SDE role',
-  'Ask me a system design interview question',
-]
-
-function pick(text: string) {
-  chat.sendMessage(text)
-}
+// Intentionally presentational — the welcome screen. No suggestion shortcuts.
 </script>
 
 <template>
   <div class="empty-state">
-    <h1 class="title">AI Code Helper</h1>
-    <p class="tagline">Ask anything about learning paths, projects, resumes, or interviews.</p>
-    <div class="suggestions">
-      <button v-for="s in suggestions" :key="s" class="suggestion-card" @click="pick(s)">
-        {{ s }}
-      </button>
-    </div>
+    <h1 class="headline">
+      <span class="line">Code smarter.</span>
+      <span class="line gradient">Ship faster.</span>
+    </h1>
+    <p class="tagline">
+      Your AI partner for learning paths, projects, resumes, and interviews.
+      Ask anything — or drop in a screenshot or PDF.
+    </p>
   </div>
 </template>
 
@@ -32,49 +20,33 @@ function pick(text: string) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  padding: 48px 16px;
-  max-width: 760px;
-  margin: 0 auto;
-}
-.title {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 8px;
-}
-.tagline {
-  color: #6b7280;
-  margin: 0 0 32px;
-}
-.suggestions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
   width: 100%;
 }
-@media (max-width: 560px) {
-  .suggestions {
-    grid-template-columns: 1fr;
-  }
+.headline {
+  margin: 0 0 18px;
+  font-weight: 700;
+  font-size: clamp(38px, 6.4vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
 }
-.suggestion-card {
-  text-align: left;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 14px;
-  color: #1f2937;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.05s;
-  line-height: 1.4;
+.headline .line {
+  display: block;
 }
-.suggestion-card:hover {
-  border-color: #9ca3af;
-  background: #f9fafb;
+.headline .gradient {
+  background: linear-gradient(120deg, #2563eb 0%, #7c3aed 55%, #db2777 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
-.suggestion-card:active {
-  transform: translateY(1px);
+.tagline {
+  margin: 0;
+  max-width: 520px;
+  color: var(--text-secondary);
+  font-size: clamp(16px, 2.2vw, 19px);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
 }
 </style>

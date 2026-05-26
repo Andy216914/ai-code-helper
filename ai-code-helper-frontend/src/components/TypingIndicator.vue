@@ -17,7 +17,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #9ca3af;
+  background: var(--text-tertiary);
   animation: bounce 1.2s infinite ease-in-out;
 }
 .dot:nth-child(2) {

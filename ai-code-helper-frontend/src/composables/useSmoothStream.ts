@@ -3,9 +3,15 @@ import { ref, onUnmounted } from 'vue'
 /**
  * Buffered typewriter for streaming text.
  * Decouples network chunk arrival (irregular bursts) from rendering (steady drain via rAF).
+ *
+ * Completion model: the network ending does NOT finalize the message. `endStream()` only
+ * marks that no more text is coming; the animation keeps draining until `displayedText` has
+ * fully caught up to `receivedText`, at which point `finished` flips true. Callers finalize
+ * the message off `finished` — so the full reply is always typed out before it completes.
  */
 export function useSmoothStream() {
   const displayedText = ref('')
+  const finished = ref(false)
   let receivedText = ''
   let rafId: number | null = null
   let lastFrameTime = 0
@@ -31,22 +37,37 @@ export function useSmoothStream() {
     if (displayedText.value.length < receivedText.length || !streamDone) {
       rafId = requestAnimationFrame(tick)
     } else {
+      // Stream ended AND fully drained — the reply is completely typed out.
       rafId = null
+      finished.value = true
     }
   }
 
   function appendChunk(chunk: string) {
     receivedText += chunk
-    if (rafId === null) {
+    if (rafId === null && !finished.value) {
       lastFrameTime = 0
       rafId = requestAnimationFrame(tick)
     }
   }
 
-  function finish() {
+  /** Network finished: keep animating until drained, then flip `finished`. */
+  function endStream() {
     streamDone = true
-    // Flush remaining buffer immediately.
-    displayedText.value = receivedText
+    if (rafId === null) {
+      if (displayedText.value.length < receivedText.length) {
+        lastFrameTime = 0
+        rafId = requestAnimationFrame(tick)
+      } else {
+        // Nothing left to animate.
+        finished.value = true
+      }
+    }
+  }
+
+  /** Abnormal stop (user stop / error): freeze where we are; caller finalizes manually. */
+  function halt() {
+    streamDone = true
     if (rafId !== null) {
       cancelAnimationFrame(rafId)
       rafId = null
@@ -59,6 +80,7 @@ export function useSmoothStream() {
     receivedText = ''
     displayedText.value = ''
     streamDone = false
+    finished.value = false
     lastFrameTime = 0
   }
 
@@ -66,5 +88,5 @@ export function useSmoothStream() {
     if (rafId !== null) cancelAnimationFrame(rafId)
   })
 
-  return { displayedText, appendChunk, finish, reset }
+  return { displayedText, finished, appendChunk, endStream, halt, reset }
 }

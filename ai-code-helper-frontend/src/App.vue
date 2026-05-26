@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { NConfigProvider, NMessageProvider, lightTheme } from 'naive-ui'
+import { computed } from 'vue'
+import { NConfigProvider, NMessageProvider, lightTheme, darkTheme } from 'naive-ui'
 import ChatView from './views/ChatView.vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { isDark } = useTheme()
+const naiveTheme = computed(() => (isDark.value ? darkTheme : lightTheme))
 </script>
 
 <template>
-  <NConfigProvider :theme="lightTheme">
+  <NConfigProvider :theme="naiveTheme">
     <NMessageProvider>
       <ChatView />
     </NMessageProvider>
