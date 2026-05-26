@@ -3,6 +3,10 @@ spring:
     name: ai-code-helper
   profiles:
     active: local
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 server:
   port: 8081
   servlet:
@@ -20,7 +24,11 @@ langchain4j:
         api-key: <You API Key here>
       streaming-chat-model:
         base-url: https://dashscope-intl.aliyuncs.com/api/v1
-        model-name: qwen-plus
+        model-name: qwen-max
+        api-key: <You API Key here>
+      vision-streaming-chat-model:
+        base-url: https://dashscope-intl.aliyuncs.com/api/v1
+        model-name: qwen-vl-max
         api-key: <You API Key here>
 tavily:
   api-key: <Your Tavily API Key>
