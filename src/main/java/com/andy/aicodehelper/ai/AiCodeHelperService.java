@@ -1,5 +1,6 @@
 package com.andy.aicodehelper.ai;
 
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.spring.AiService;
 

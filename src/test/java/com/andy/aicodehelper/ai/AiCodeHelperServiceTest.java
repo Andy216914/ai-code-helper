@@ -17,4 +17,12 @@ class AiCodeHelperServiceTest {
         String result = aiCodeHelperService.chat("Hi! I'm Andy and I love agentic development!");
         System.out.println(result);
     }
+
+    @Test
+    void chatWithMemory() {
+        String result = aiCodeHelperService.chat("Hi! I'm Andy");
+        System.out.println(result);
+        result = aiCodeHelperService.chat("Who am I?");
+        System.out.println(result);
+    }
 }

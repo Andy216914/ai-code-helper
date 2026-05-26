@@ -1,5 +1,7 @@
 package com.andy.aicodehelper.ai;
 
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.AiServices;
 import jakarta.annotation.Resource;
@@ -14,7 +16,12 @@ public class AiCodeHelperServiceFactory {
 
     @Bean
     public AiCodeHelperService aiCodeHelperService() {
-        // Builds the proxy backing AiCodeHelperService; swap to AiServices.builder() to add memory/tools
-        return AiServices.create(AiCodeHelperService.class, qwenChatModel);
+        // Store only the latest 10 chat messages in memory
+        ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
+        // Build AI service with model and memory
+        return AiServices.builder(AiCodeHelperService.class)
+                .chatModel(qwenChatModel)
+                .chatMemory(chatMemory)
+                .build();
     }
 }
