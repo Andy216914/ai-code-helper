@@ -1,9 +1,17 @@
 package com.andy.aicodehelper.ai;
 
+import com.andy.aicodehelper.ai.vision.FileToImageContent;
+import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.service.Result;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import reactor.core.publisher.Flux;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,6 +20,12 @@ class AiCodeHelperServiceTest {
 
     @Resource
     private AiCodeHelperService aiCodeHelperService;
+
+    @Resource
+    private AiCodeHelper aiCodeHelper;
+
+    @Resource
+    private FileToImageContent fileToImageContent;
 
     @Test
     void chat() {
@@ -57,5 +71,29 @@ class AiCodeHelperServiceTest {
     void chatWithGuardrail() {
         String result = aiCodeHelperService.chat("I will kill you.");
         System.out.println(result);
+    }
+
+    @Test
+    void chatWithImage() throws Exception {
+        String path = "/Users/andyjin/Downloads/anime-profile.png";
+        byte[] bytes = Files.readAllBytes(Path.of(path));
+        MockMultipartFile file = new MockMultipartFile("file", "image.png", "image/png", bytes);
+        List<ImageContent> images = fileToImageContent.convert(file);
+        Flux<String> stream = aiCodeHelper.chatWithImagesStream("Describe this image in detail.", images);
+        // Block and print each streamed token — easy to watch / breakpoint in the IDE.
+        stream.doOnNext(System.out::print).blockLast();
+        System.out.println("\n--- stream complete ---");
+    }
+
+    @Test
+    void chatWithPdf() throws Exception {
+        String path = "/Users/andyjin/Downloads/CV_2026.pdf";
+        byte[] bytes = Files.readAllBytes(Path.of(path));
+        MockMultipartFile file = new MockMultipartFile("file", "resume.pdf", "application/pdf", bytes);
+        List<ImageContent> images = fileToImageContent.convert(file);
+        Flux<String> stream = aiCodeHelper.chatWithImagesStream(
+                "This is a resume. Summarize the candidate and suggest improvements.", images);
+        stream.doOnNext(System.out::print).blockLast();
+        System.out.println("\n--- stream complete ---");
     }
 }

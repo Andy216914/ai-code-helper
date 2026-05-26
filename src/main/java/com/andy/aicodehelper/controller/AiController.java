@@ -30,12 +30,19 @@ public class AiController {
     @Resource
     private FileToImageContent fileToImageContent;
 
-    @GetMapping("/chat")
+    @GetMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> chat(int memoryId, String message) {
         return aiCodeHelperService.chatStream(memoryId, message)
                 .map(chunk -> ServerSentEvent.<String>builder()
                         .data(chunk)
-                        .build());
+                        .build())
+                // Explicit end-of-stream marker so the client can PROVE the reply finished.
+                // concatWith only runs after the model stream completes normally; if it errors,
+                // the marker is not sent and the client treats the reply as interrupted.
+                .concatWith(Flux.just(ServerSentEvent.<String>builder()
+                        .event("done")
+                        .data("")
+                        .build()));
     }
 
     // Multimodal chat: upload an image or PDF (screenshot, resume) + a question.
@@ -49,6 +56,11 @@ public class AiController {
         return aiCodeHelper.chatWithImagesStream(message, images)
                 .map(chunk -> ServerSentEvent.<String>builder()
                         .data(chunk)
-                        .build());
+                        .build())
+                // Same end-of-stream marker as the text endpoint (see chat()).
+                .concatWith(Flux.just(ServerSentEvent.<String>builder()
+                        .event("done")
+                        .data("")
+                        .build()));
     }
 }
