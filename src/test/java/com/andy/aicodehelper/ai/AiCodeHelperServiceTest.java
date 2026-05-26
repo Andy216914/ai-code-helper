@@ -58,6 +58,4 @@ class AiCodeHelperServiceTest {
         String result = aiCodeHelperService.chat("I will kill you.");
         System.out.println(result);
     }
-
-
 }

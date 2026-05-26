@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class SafeInputGuardrail implements InputGuardrail {
 
-    private static final Set<String> sensitiveWords = Set.of("evil", "weapon");
+    private static final Set<String> sensitiveWords = Set.of("evil", "kill");
 
     /**
      * Check whether the user input is safe
