@@ -5,6 +5,7 @@ import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
 import jakarta.annotation.Resource;
@@ -23,6 +24,9 @@ public class AiCodeHelperServiceFactory {
     @Resource
     private McpToolProvider mcpToolProvider;
 
+    @Resource
+    private StreamingChatModel qwenStreamingChatModel;
+
     @Bean
     public AiCodeHelperService aiCodeHelperService() {
         // Store only the latest 10 chat messages in memory
@@ -30,7 +34,9 @@ public class AiCodeHelperServiceFactory {
         // Build AI service with model and memory
         AiCodeHelperService aiCodeHelperService = AiServices.builder(AiCodeHelperService.class)
                 .chatModel(myQwenChatModel)
+                .streamingChatModel(qwenStreamingChatModel) // Streaming chat conversation
                 .chatMemory(chatMemory)
+                .chatMemoryProvider(memory -> MessageWindowChatMemory.withMaxMessages(10)) // Configure a separate chat memory window for each user/session
                 .contentRetriever(contentRetriever) // RAG
                 .tools(new InterviewQuestionTool()) // tool calling
                 .toolProvider(mcpToolProvider) // MCP tool calling

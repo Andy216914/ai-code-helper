@@ -1,9 +1,12 @@
 package com.andy.aicodehelper.ai;
 
 import com.andy.aicodehelper.ai.guardrail.SafeInputGuardrail;
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.guardrail.InputGuardrails;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -25,4 +28,7 @@ public interface AiCodeHelperService {
 
     @SystemMessage(fromResource = "system-prompt.txt")
     Result<String> chatWithRag(String userMessage);
+
+    // Streaming chat conversation
+    Flux<String> chatStream(@MemoryId int memoryId, @UserMessage String userMessage);
 }
