@@ -20,7 +20,7 @@ langchain4j:
         api-key: <You API Key here>
       embedding-model:
         base-url: https://dashscope-intl.aliyuncs.com/api/v1
-        model-name: text-embedding-v4
+        model-name: text-embedding-v3
         api-key: <You API Key here>
       streaming-chat-model:
         base-url: https://dashscope-intl.aliyuncs.com/api/v1
