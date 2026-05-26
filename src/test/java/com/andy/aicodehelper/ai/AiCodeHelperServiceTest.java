@@ -40,4 +40,10 @@ class AiCodeHelperServiceTest {
         System.out.println(result.sources());
         System.out.println(result.content());
     }
+
+    @Test
+    void chatWithTools() {
+        String result = aiCodeHelperService.chat("Search for python interview questions.");
+        System.out.println(result);
+    }
 }

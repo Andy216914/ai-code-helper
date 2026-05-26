@@ -1,5 +1,6 @@
 package com.andy.aicodehelper.ai;
 
+import com.andy.aicodehelper.ai.tools.InterviewQuestionTool;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
@@ -27,6 +28,7 @@ public class AiCodeHelperServiceFactory {
                 .chatModel(qwenChatModel)
                 .chatMemory(chatMemory)
                 .contentRetriever(contentRetriever) // RAG
+                .tools(new InterviewQuestionTool()) // tool calling
                 .build();
         return aiCodeHelperService;
     }
