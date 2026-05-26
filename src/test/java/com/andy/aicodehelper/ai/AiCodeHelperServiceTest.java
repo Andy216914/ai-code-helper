@@ -1,5 +1,6 @@
 package com.andy.aicodehelper.ai;
 
+import dev.langchain4j.service.Result;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,5 +32,12 @@ class AiCodeHelperServiceTest {
         String userMessage ="Hi! I'm Andy. Give me some advice on how to find a SWE position in this ai era.";
         AiCodeHelperService.Report report = aiCodeHelperService.chatForReport(userMessage);
         System.out.println(report);
+    }
+
+    @Test
+    void chatWithRag() {
+        Result<String> result = aiCodeHelperService.chatWithRag("How should I study java?");
+        System.out.println(result.sources());
+        System.out.println(result.content());
     }
 }

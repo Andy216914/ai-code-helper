@@ -1,8 +1,7 @@
 package com.andy.aicodehelper.ai;
 
-import dev.langchain4j.service.MemoryId;
+import dev.langchain4j.service.Result;
 import dev.langchain4j.service.SystemMessage;
-import dev.langchain4j.service.spring.AiService;
 
 import java.util.List;
 
@@ -20,4 +19,7 @@ public interface AiCodeHelperService {
 
     // Immutable data shape the AI fills in (auto-generates constructor + name()/suggestionList() accessors).
     record Report(String name, List<String> suggestionList){}
+
+    @SystemMessage(fromResource = "system-prompt.txt")
+    Result<String> chatWithRag(String userMessage);
 }
