@@ -46,4 +46,11 @@ class AiCodeHelperServiceTest {
         String result = aiCodeHelperService.chat("Search for python interview questions.");
         System.out.println(result);
     }
+
+    @Test
+    void chatWithMcp() {
+        String result = aiCodeHelperService.chat("What is the average salary for entry level SWE developers in Atlanta?");
+        System.out.println(result);
+    }
+
 }

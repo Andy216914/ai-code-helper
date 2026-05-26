@@ -1,6 +1,7 @@
 package com.andy.aicodehelper.ai;
 
 import com.andy.aicodehelper.ai.tools.InterviewQuestionTool;
+import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
@@ -19,6 +20,9 @@ public class AiCodeHelperServiceFactory {
     @Resource
     private ContentRetriever contentRetriever;
 
+    @Resource
+    private McpToolProvider mcpToolProvider;
+
     @Bean
     public AiCodeHelperService aiCodeHelperService() {
         // Store only the latest 10 chat messages in memory
@@ -29,6 +33,7 @@ public class AiCodeHelperServiceFactory {
                 .chatMemory(chatMemory)
                 .contentRetriever(contentRetriever) // RAG
                 .tools(new InterviewQuestionTool()) // tool calling
+                .toolProvider(mcpToolProvider) // MCP tool calling
                 .build();
         return aiCodeHelperService;
     }
