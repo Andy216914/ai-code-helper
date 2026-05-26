@@ -25,4 +25,11 @@ class AiCodeHelperServiceTest {
         result = aiCodeHelperService.chat("Who am I?");
         System.out.println(result);
     }
+
+    @Test
+    void chatForReport() {
+        String userMessage ="Hi! I'm Andy. Give me some advice on how to find a SWE position in this ai era.";
+        AiCodeHelperService.Report report = aiCodeHelperService.chatForReport(userMessage);
+        System.out.println(report);
+    }
 }
