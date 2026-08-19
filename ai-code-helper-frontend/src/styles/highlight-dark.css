@@ -1,29 +1,28 @@
-/*
- * Dark-mode syntax highlighting (github-dark palette), scoped under [data-theme='dark']
- * so it overrides the light github.css imported in utils/markdown.ts only in dark mode.
- * Backgrounds are intentionally omitted — the code-block wrapper drives those via tokens.
- */
 [data-theme='dark'] .hljs {
-  color: #c9d1d9;
+  color: #d4d4d8;
 }
+
 [data-theme='dark'] .hljs-comment,
 [data-theme='dark'] .hljs-meta {
-  color: #8b949e;
+  color: #8b8f98;
 }
+
 [data-theme='dark'] .hljs-keyword,
 [data-theme='dark'] .hljs-doctag,
 [data-theme='dark'] .hljs-template-tag,
 [data-theme='dark'] .hljs-template-variable,
 [data-theme='dark'] .hljs-type,
 [data-theme='dark'] .hljs-variable.language_ {
-  color: #ff7b72;
+  color: #c4b5fd;
 }
+
 [data-theme='dark'] .hljs-title,
 [data-theme='dark'] .hljs-title.class_,
 [data-theme='dark'] .hljs-title.class_.inherited__,
 [data-theme='dark'] .hljs-title.function_ {
-  color: #d2a8ff;
+  color: #93c5fd;
 }
+
 [data-theme='dark'] .hljs-attr,
 [data-theme='dark'] .hljs-attribute,
 [data-theme='dark'] .hljs-literal,
@@ -33,34 +32,41 @@
 [data-theme='dark'] .hljs-selector-attr,
 [data-theme='dark'] .hljs-selector-class,
 [data-theme='dark'] .hljs-selector-id {
-  color: #79c0ff;
+  color: #7dd3fc;
 }
+
 [data-theme='dark'] .hljs-string,
 [data-theme='dark'] .hljs-meta .hljs-string,
 [data-theme='dark'] .hljs-regexp {
-  color: #a5d6ff;
+  color: #86efac;
 }
+
 [data-theme='dark'] .hljs-built_in,
 [data-theme='dark'] .hljs-symbol {
-  color: #ffa657;
+  color: #fcd34d;
 }
+
 [data-theme='dark'] .hljs-section,
 [data-theme='dark'] .hljs-bullet,
 [data-theme='dark'] .hljs-name,
 [data-theme='dark'] .hljs-selector-tag {
-  color: #7ee787;
+  color: #fca5a5;
 }
+
 [data-theme='dark'] .hljs-emphasis {
   font-style: italic;
 }
+
 [data-theme='dark'] .hljs-strong {
   font-weight: 600;
 }
+
 [data-theme='dark'] .hljs-addition {
-  color: #aff5b4;
-  background-color: #033a16;
+  color: #bbf7d0;
+  background-color: #14532d;
 }
+
 [data-theme='dark'] .hljs-deletion {
-  color: #ffdcd7;
-  background-color: #67060c;
+  color: #fecaca;
+  background-color: #7f1d1d;
 }

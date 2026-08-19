@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls -la /Users/andyjin/Documents/agent/ai-code-helper/)",
-      "Read(//Users/andyjin/Documents/agent/ai-code-helper/**)"
-    ]
-  }
-}

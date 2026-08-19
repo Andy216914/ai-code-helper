@@ -1,17 +1,16 @@
 <script setup lang="ts">
-// Intentionally presentational — the welcome screen. No suggestion shortcuts.
+import StarterPrompts from './StarterPrompts.vue'
+import type { StarterPrompt } from '@/config/starterPrompts'
+
+const emit = defineEmits<{
+  (e: 'select', starter: StarterPrompt): void
+}>()
 </script>
 
 <template>
   <div class="empty-state">
-    <h1 class="headline">
-      <span class="line">Code smarter.</span>
-      <span class="line gradient">Ship faster.</span>
-    </h1>
-    <p class="tagline">
-      Your AI partner for learning paths, projects, resumes, and interviews.
-      Ask anything — or drop in a screenshot or PDF.
-    </p>
+    <h1 class="prompt">What are you working on?</h1>
+    <StarterPrompts @select="emit('select', $event)" />
   </div>
 </template>
 
@@ -23,30 +22,13 @@
   text-align: center;
   width: 100%;
 }
-.headline {
-  margin: 0 0 18px;
-  font-weight: 700;
-  font-size: clamp(38px, 6.4vw, 64px);
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  color: var(--text-primary);
-}
-.headline .line {
-  display: block;
-}
-.headline .gradient {
-  background: linear-gradient(120deg, #2563eb 0%, #7c3aed 55%, #db2777 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-.tagline {
-  margin: 0;
-  max-width: 520px;
-  color: var(--text-secondary);
-  font-size: clamp(16px, 2.2vw, 19px);
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+
+.prompt {
+  margin: 0 0 20px;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 550;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
 }
 </style>

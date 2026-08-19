@@ -1,4 +1,5 @@
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
+import { circularThemeReveal, type ThemeRevealContext } from '@/utils/themeReveal'
 
 export type ThemeMode = 'light' | 'dark'
 
@@ -16,14 +17,13 @@ function initialMode(): ThemeMode {
   return systemPrefersDark() ? 'dark' : 'light'
 }
 
-// Module-level singleton so every component shares one reactive theme.
 const mode = ref<ThemeMode>(initialMode())
+const isTransitioning = ref(false)
 
 function apply(next: ThemeMode) {
   document.documentElement.setAttribute('data-theme', next)
 }
 
-// Apply once on module load so there's no flash of the wrong theme.
 if (typeof document !== 'undefined') apply(mode.value)
 
 export function useTheme() {
@@ -34,14 +34,24 @@ export function useTheme() {
     apply(next)
     try {
       localStorage.setItem(STORAGE_KEY, next)
-    } catch {
-      // storage may be unavailable (private mode) — theme still applies for the session
+    } catch {}
+  }
+
+  async function toggleFromOrigin(context: ThemeRevealContext) {
+    if (isTransitioning.value) return
+
+    const next: ThemeMode = mode.value === 'dark' ? 'light' : 'dark'
+    isTransitioning.value = true
+
+    try {
+      await circularThemeReveal(context, async () => {
+        setMode(next)
+        await nextTick()
+      })
+    } finally {
+      isTransitioning.value = false
     }
   }
 
-  function toggle() {
-    setMode(mode.value === 'dark' ? 'light' : 'dark')
-  }
-
-  return { mode, isDark, setMode, toggle }
+  return { isDark, isTransitioning, toggleFromOrigin }
 }

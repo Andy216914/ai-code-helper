@@ -15,9 +15,24 @@ themes.
 
 ## Screenshots
 
-| Landing | Conversation |
-| --- | --- |
-| ![Landing screen](docs/landing.png) | ![Chat conversation](docs/chat.png) |
+### Landing (dark theme)
+
+<p align="center">
+  <img src="docs/landing.png" alt="Dark landing view with starter prompts and a prefilled composer" width="100%">
+</p>
+
+The landing view shows suggested prompts (debug, learning plan, code review, interviews) and a
+hero composer.
+
+### Conversation (light theme)
+
+<p align="center">
+  <img src="docs/chat.png" alt="Light conversation view with syntax-highlighted code blocks, copy and wrap actions, and a docked composer" width="100%">
+</p>
+
+Once you send a message, the conversation view streams replies with aligned Markdown content,
+syntax-highlighted code blocks (including directory trees and multi-language snippets), and per-block
+copy and wrap actions.
 
 ---
 
@@ -43,7 +58,8 @@ local document set when it helps.
 - **Interview-question lookup** via a custom tool.
 - **Retrieval-augmented answers** grounded in a local knowledge base.
 - **Markdown rendering** with code syntax highlighting and per-block copy.
-- **Light and dark themes** that follow the system preference and persist across reloads.
+- **Light and dark themes** with a circular reveal animation from the theme toggle; preference
+  persists across reloads.
 - **Reliable completion** — a reply is only marked complete once the server signals end-of-stream,
   so interrupted responses surface a retry instead of silently truncating.
 

@@ -9,31 +9,40 @@
 <style scoped>
 .typing-indicator {
   display: inline-flex;
-  gap: 4px;
+  gap: 5px;
   align-items: center;
-  padding: 4px 0;
+  padding: 2px 0;
 }
+
 .dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--text-tertiary);
-  animation: bounce 1.2s infinite ease-in-out;
+  background: var(--foreground-muted);
+  animation: pulse 1.4s infinite var(--ease-out);
 }
+
 .dot:nth-child(2) {
   animation-delay: 0.15s;
 }
+
 .dot:nth-child(3) {
   animation-delay: 0.3s;
 }
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.35;
   }
-  40% {
-    transform: translateY(-4px);
+  50% {
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+    opacity: 0.6;
   }
 }
 </style>
